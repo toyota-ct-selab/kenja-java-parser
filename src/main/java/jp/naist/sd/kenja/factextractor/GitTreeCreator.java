@@ -3,12 +3,13 @@ package jp.naist.sd.kenja.factextractor;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.io.IOException;
 
 import jp.naist.sd.kenja.factextractor.ast.ASTCompilation;
+import jp.naist.sd.kenja.factextractor.ast.CommentVisitor;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -17,6 +18,9 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepository;
+import org.eclipse.jdt.core.dom.Comment;
+import org.eclipse.jdt.core.dom.LineComment;
+import org.eclipse.jdt.core.dom.BlockComment;
 
 public class GitTreeCreator {
   private Tree root = new Tree("");
@@ -28,12 +32,32 @@ public class GitTreeCreator {
 
   private void parseSourcecode(char[] src) {
     ASTParser parser = ASTParser.newParser(AST.JLS4);
-
     parser.setSource(src);
-
+  
     NullProgressMonitor nullMonitor = new NullProgressMonitor();
     CompilationUnit unit = (CompilationUnit) parser.createAST(nullMonitor);
-
+    
+    List<?> commentList = unit.getCommentList();
+    System.out.println(commentList.toString());
+    
+    String[] splitted = String.valueOf(src).split("\n"); 
+    CommentVisitor cv = new CommentVisitor(unit, splitted);
+    // 標準入力で与えたソースコードの表示
+    for(int i=0; i < splitted.length; i++) {
+    	System.out.println(splitted[i]);
+    }
+    
+    // LineCommentの表示
+    for(int i = 0;i < commentList.size();i++) {
+    	if(((Comment) commentList.get(i)).isLineComment()) {
+    		cv.visit((LineComment)commentList.get(i));
+    	}else if(((Comment) commentList.get(i)).isBlockComment()){
+    		cv.visit((BlockComment)commentList.get(i));
+    	}
+    	
+    		
+    } 
+    
     compilation = new ASTCompilation(unit, root);
   }
 

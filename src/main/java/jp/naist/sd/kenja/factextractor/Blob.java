@@ -1,3 +1,4 @@
+/* top */
 package jp.naist.sd.kenja.factextractor;
 
 public class Blob {
@@ -14,14 +15,17 @@ public class Blob {
     this.body = "";
     this.name = name;
   }
-
+ // middle
   public String getBody() {
     return body;
   }
-
+ /**************************/
   public String getName() {
     return name;
   }
+  /*   public String getName() {
+      return name;
+    } */
 
   public void setBody(String body) {
     this.body = body;
@@ -31,3 +35,5 @@ public class Blob {
     this.name = name;
   }
 }
+
+//* bottom4646845618ふぁｊふぉあいう */
